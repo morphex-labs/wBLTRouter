@@ -62,11 +62,11 @@ contract wBltOracle is Ownable {
         returns (uint80, int256, uint256, uint256, uint80)
     {
         return (
-            uint80(0),
+            uint80(block.number),
             int256(_getNormalizedPrice()),
-            uint256(0),
-            uint256(0),
-            uint80(0)
+            block.timestamp,
+            block.timestamp,
+            uint80(block.number)
         );
     }
 
