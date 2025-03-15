@@ -2,7 +2,7 @@
 pragma solidity ^0.8.15;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts@4.8.0/access/Ownable2Step.sol";
 
 interface IVault is IERC20 {
     // returns value of one wBLT in BLT tokens
@@ -14,7 +14,7 @@ interface IBltManager {
     function getAum(bool maximise) external view returns (uint256);
 }
 
-contract wBltOracle is Ownable {
+contract wBltOracle is Ownable2Step {
     /* ========== STATE VARIABLES ========== */
 
     /// @notice BMX's BLT Manager, use this to pull our total AUM in BLT.
@@ -107,5 +107,9 @@ contract wBltOracle is Ownable {
 
         manualPriceCap = _manualWbltPriceCap;
         emit ManualPriceCapUpdated(_manualWbltPriceCap);
+    }
+
+    function renounceOwnership() public override onlyOwner {
+        revert();
     }
 }
