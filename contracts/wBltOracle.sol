@@ -2,7 +2,7 @@
 pragma solidity ^0.8.15;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts@4.8.0/access/Ownable2Step.sol";
+import "@openzeppelin/contracts/access/Ownable2Step.sol";
 
 interface IVault is IERC20 {
     // returns value of one wBLT in BLT tokens
