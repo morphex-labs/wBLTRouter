@@ -26,10 +26,6 @@ contract wBltOracle is Ownable2Step {
     /// @notice Address of our wBLT, a Yearn vault token.
     IVault public immutable wBlt;
 
-    /// @notice Set a hard cap on our wBLT price that we know it is unlikely to go above any time soon.
-    /// @dev This may be adjusted by owner.
-    uint256 public manualPriceCap;
-
     /* ========== CONSTRUCTOR ========== */
 
     constructor(IBltManager _bltManager, IERC20 _blt, IVault _wBlt) {
@@ -39,12 +35,7 @@ contract wBltOracle is Ownable2Step {
         bltManager = _bltManager;
         blt = _blt;
         wBlt = _wBlt;
-        manualPriceCap = 1.5e18;
     }
-
-    /* ========== EVENTS ========== */
-
-    event ManualPriceCapUpdated(uint256 manualWmlpPriceCap);
 
     /* ========== VIEWS ========== */
 
@@ -63,7 +54,7 @@ contract wBltOracle is Ownable2Step {
     {
         return (
             uint80(block.number),
-            int256(_getNormalizedPrice()),
+            int256(getLivePrice()),
             block.timestamp,
             block.timestamp,
             uint80(block.number)
@@ -80,33 +71,6 @@ contract wBltOracle is Ownable2Step {
         uint256 sharePrice = wBlt.pricePerShare();
 
         return (bltPrice * sharePrice) / 1e18;
-    }
-
-    // Pulls the live wBLT price and caps it at a hard cap
-    function _getNormalizedPrice()
-        internal
-        view
-        returns (uint256 normalizedPrice)
-    {
-        normalizedPrice = getLivePrice();
-
-        // use a hard cap to protect against oracle pricing errors
-        if (normalizedPrice > manualPriceCap) {
-            normalizedPrice = manualPriceCap;
-        }
-    }
-
-    /* ========== SETTERS ========== */
-
-    /// @notice Set the hard price cap for our wBLT, which has 18 decimals
-    /// @dev This may only be called by owner
-    function setManualWbltPriceCap(
-        uint256 _manualWbltPriceCap
-    ) external onlyOwner {
-        require(_manualWbltPriceCap > 0, "Price cap cannot be zero");
-
-        manualPriceCap = _manualWbltPriceCap;
-        emit ManualPriceCapUpdated(_manualWbltPriceCap);
     }
 
     function renounceOwnership() public override onlyOwner {
